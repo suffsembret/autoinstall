@@ -1,73 +1,44 @@
 #!/bin/bash
 
-# Update package lists and install required packages
-echo "Updating and installing required packages..."
-apt update && apt install -y apache2 php mariadb-server phpmyadmin wget unzip
+# Memastikan script dijalankan sebagai root
+if [ "$EUID" -ne 0 ]; then
+  echo "Harap jalankan sebagai root."
+  exit
+fi
 
-# Download WordPress
-WORDPRESS_ZIP_URL="http://172.16.90.2/unduh/wordpress.zip"
-echo "Downloading WordPress from $WORDPRESS_ZIP_URL..."
-wget -O wordpress.zip $WORDPRESS_ZIP_URL
+# Update dan instalasi paket yang diperlukan
+echo "Menginstal paket yang diperlukan..."
+apt update && apt install openssh-server apache2 php mariadb-server phpmyadmin wget unzip -y
 
-# Move WordPress to the web directory
-echo "Moving WordPress to /var/www/html..."
-mv wordpress.zip /var/www/html/
-cd /var/www/html/
+# Konfigurasi phpMyAdmin
+read -p "Masukkan password untuk phpMyAdmin: " phpmyadmin_password
+mysql -u root -e "ALTER USER 'phpmyadmin'@'localhost' IDENTIFIED BY '$phpmyadmin_password';"
 
-# Check contents and proceed
-echo "Unzipping WordPress..."
+# Konfigurasi SSH untuk mengizinkan login root
+echo "Mengonfigurasi SSH untuk login root..."
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+systemctl restart ssh
+
+# Unduh dan ekstrak WordPress
+echo "Mengunduh dan mengekstrak WordPress..."
+cd /var/www/html
+wget http://172.16.90.2/unduh/wordpress.zip
 unzip wordpress.zip
+chmod -R 777 wordpress
 
-# Remove default index.html if exists
-echo "Removing default index.html..."
-rm -f index.html
-
-# Move WordPress files to the root of the web directory
-echo "Organizing WordPress files..."
-cd wordpress
-mv * ../
-cd ..
-rm -rf wordpress
-
-# Set permissions
-echo "Setting permissions for /var/www/html..."
-chmod -R 777 /var/www/html/
-
-# Secure MySQL installation
-echo "Securing MySQL installation..."
-mysql_secure_installation <<EOF
-n
-123
-123
-y
-y
-y
-y
+# Konfigurasi database untuk WordPress
+echo "Membuat database untuk WordPress..."
+mysql -u root -p <<EOF
+CREATE DATABASE dbwordpress;
+CREATE USER 'adminwordpress'@'localhost' IDENTIFIED BY 'passwordwordpress';
+GRANT ALL PRIVILEGES ON dbwordpress.* TO 'adminwordpress'@'localhost';
+FLUSH PRIVILEGES;
 EOF
 
-# Create WordPress database
-echo "Creating WordPress database..."
-mysql -u root -p123 <<EOF
-CREATE DATABASE wordpress;
-EXIT;
-EOF
-
-# Final instructions
-echo "WordPress setup is complete. Open your browser and navigate to the server's IP address."
-echo "Complete the WordPress setup wizard with the following details:"
-echo "Database Name: wordpress"
-echo "Database User: root"
-echo "Database Password: 123"
-echo "Database Host: localhost"
-echo "--- Site Details ---"
-echo "Site Title: Website"
-echo "Username: sufyan"
-echo "Password: bebas"
-echo "Email: admin@admin.net"
-
-# Restart Apache2 to apply changes
-echo "Restarting Apache2..."
+# Restart layanan Apache untuk memastikan semua berjalan
+echo "Restart layanan Apache..."
 systemctl restart apache2
 
-# Done
-echo "WordPress installation script completed successfully!"
+echo "Proses instalasi WordPress selesai!"
+echo "Anda dapat melanjutkan konfigurasi melalui browser."
