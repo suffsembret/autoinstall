@@ -1,6 +1,7 @@
 import requests
 
-api_address = "http://192.168.100.6:7557"
+api_address = "http://192.168.0.111:7557" #IP Address Debian Server
+ssid_Ke = "4",
 
 def gantissid(data, ssid):
     print("acs:", data["sn"])
@@ -8,11 +9,12 @@ def gantissid(data, ssid):
         parameter = {
             "name": "setParameterValues",
             "parameterValues": [
-                ["InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.SSID", ssid, "xsd:string"]
+                [f"Device.WiFi.SSID.1.SSID", ssid, "xsd:string"]
             ]
         }
         response = requests.post(f'{api_address}/devices/{data["sn"]}/tasks?connection_request', json=parameter)
         print(response.status_code)
+        print(response.json())
         return response.status_code
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
@@ -24,7 +26,7 @@ def gantipw(data, password):
         parameter = {
             "name": "setParameterValues",
             "parameterValues": [
-                ["InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.PreSharedKey.1.PreSharedKey", password, "xsd:string"]
+                [f"Device.WiFi.AccessPoint.1.Security.KeyPassphrase.{ssid_Ke}.PreSharedKey.1.PreSharedKey", password, "xsd:string"]
             ]
         }
         response = requests.post(f'{api_address}/devices/{data["sn"]}/tasks?connection_request', json=parameter)
@@ -40,8 +42,8 @@ def gantissidpw(data, ssid, pw):
         parameter = {
             "name": "setParameterValues",
             "parameterValues": [
-                ["InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.SSID", ssid, "xsd:string"],
-                ["InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.PreSharedKey.1.PreSharedKey", pw, "xsd:string"]
+                [f"Device.WiFi.SSID.1.SSID.{ssid_Ke}.SSID", ssid, "xsd:string"],
+                [f"Device.WiFi.AccessPoint.1.Security.KeyPassphrase.{ssid_Ke}.PreSharedKey.1.PreSharedKey", pw, "xsd:string"]
             ]
         }
         response = requests.post(f'{api_address}/devices/{data["sn"]}/tasks?connection_request', json=parameter)
