@@ -59,7 +59,11 @@ def handle_ssid(message):
     result = gantissid(data, ssid)
     
     print(result)
-    bot.reply_to(message, f"SSID berhasil diubah menjadi {ssid}")
+    if result == 200:  # Check for integer status code
+        bot.reply_to(message, f"SSID berhasil diubah menjadi {ssid}")
+    else:
+        bot.reply_to(message, "Gagal mengubah SSID")
+    
     sufyan_state.pop(chat_id)  # Reset state after completion
 
 # Handle serial number input for password change
@@ -85,7 +89,11 @@ def handle_password(message):
         result = gantipw(data, pw)
         print(result)
         
-        bot.reply_to(message, f"Password berhasil diubah menjadi {pw}")
+        if result == 200 or result == 202:  # Check for integer status code
+            bot.reply_to(message, f"Password berhasil diubah menjadi {pw}")
+        else:
+            bot.reply_to(message, "Gagal mengubah password")
+        
         sufyan_state.pop(chat_id)  # Reset state after completion
 
 # Handle serial number input for SSID and password change
@@ -123,7 +131,11 @@ def handle_pw_ssid(message):
         result = gantissidpw(data, ssid, pw)
         print(result)
 
-        bot.reply_to(message, f"SSID berhasil diubah menjadi {ssid} dan password berhasil diubah menjadi {pw}")
+        if result == 200 or result == 202:  # Check for integer status code
+            bot.reply_to(message, f"SSID berhasil diubah menjadi {ssid} dan password berhasil diubah menjadi {pw}")
+        else:
+            bot.reply_to(message, "Gagal mengubah SSID dan password")
+        
         sufyan_state.pop(chat_id)  # Reset state after completion
 
 bot.polling(none_stop=True)
