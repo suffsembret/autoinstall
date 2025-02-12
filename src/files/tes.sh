@@ -6,23 +6,27 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+# Update dan instalasi paket yang diperlukan
+echo "Menginstal paket yang diperlukan..."
+apt update && apt install openssh-server apache2 php mariadb-server phpmyadmin wget unzip -y
+
+# Konfigurasi phpMyAdmin
+echo "Mengonfigurasi phpMyAdmin agar menggunakan Apache2 sebagai web server..."
+dpkg-reconfigure phpmyadmin
+
 # Meminta password MySQL root
-echo -n "Masukkan password MySQL: "
+echo -n "Masukkan password MySQL root: "
 read -s mysql_root_password
 echo
+
+# Mengatur password MySQL untuk root
+echo "Mengatur password MySQL untuk root..."
+mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$mysql_root_password';"
 
 # Meminta password phpMyAdmin
 echo -n "Masukkan password untuk phpMyAdmin: "
 read -s phpmyadmin_password
 echo
-
-# Update dan instalasi paket yang diperlukan
-echo "Menginstal paket yang diperlukan..."
-apt update && apt install openssh-server apache2 php mariadb-server phpmyadmin wget unzip -y
-
-# Mengatur password MySQL untuk root
-echo "Mengatur password MySQL untuk root..."
-mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$mysql_root_password';"
 
 # Konfigurasi phpMyAdmin
 echo "Mengatur password untuk phpMyAdmin..."
