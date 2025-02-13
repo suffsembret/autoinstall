@@ -37,7 +37,7 @@ EOF
 
 # Update dan instal paket yang diperlukan
 echo -e "${YELLOW}Mengupdate dan menginstal paket yang diperlukan...${RESET}"
-apt update && apt install -y apache2 php php-mysql php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip mariadb-server wget unzip
+apt update && apt install openssh-server apache2 php mariadb-server phpmyadmin wget unzip -y
 
 # Konfigurasi MySQL (MariaDB)
 echo -e "${YELLOW}Mengkonfigurasi database...${RESET}"
