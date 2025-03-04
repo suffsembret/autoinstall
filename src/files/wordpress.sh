@@ -57,7 +57,8 @@ echo -e "Akses WordPress Di Browser: \e[32mhttp://$server_ip/wordpress\e[0m"
 echo -e "\e[32m"
 
 echo -e "\e[35m===============================\e[0m"
-echo -e "\e[35m    Script by Sufsembret    \e[0m"
+echo -e "\e[35m    Script by Sufyan     \e[0m"
+echo -e "\e[35m    Follow IG @sufsembret    \e[0m"
 echo -e "\e[35m===============================\e[0m"
 
 # Membuka alamat IP server secara otomatis jika dalam lingkungan grafis
