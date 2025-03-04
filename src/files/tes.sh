@@ -46,13 +46,24 @@ EOF
 echo "Restart layanan Apache..."
 systemctl restart apache2
 
+# Mendapatkan alamat IP server
+server_ip=$(hostname -I | awk '{print $1}')
+
 # Informasi akhir
 echo -e "\e[32mInstalasi selesai!\e[0m"
-echo -e "Akses phpMyAdmin di: \e[34mhttp://<your_server_ip>/phpmyadmin\e[0m"
-echo -e "Akses WordPress di: \e[34mhttp://<your_server_ip>/wordpress\e[0m"
+echo -e "Akses phpMyAdmin di: \e[34mhttp://$server_ip/phpmyadmin\e[0m"
+echo -e "Akses WordPress di: \e[34mhttp://$server_ip/wordpress\e[0m"
 echo -e "\e[33mGantilah <your_server_ip> dengan alamat IP server Anda.\e[0m"
 echo -e "\e[32m"
 
 echo -e "\e[35m===============================\e[0m"
 echo -e "\e[35m    Script by Sufsembret    \e[0m"
 echo -e "\e[35m===============================\e[0m"
+
+# Membuka alamat IP server secara otomatis jika dalam lingkungan grafis
+if command -v xdg-open &> /dev/null; then
+  xdg-open "http://$server_ip/wordpress"
+elif command -v gnome-open &> /dev/null; then
+  gnome-open "http://$server_ip/wordpress"
+elif command -v sensible-browser &> /dev/null; then
+  sensible-browser "http://$server_ip/wordpress"i
