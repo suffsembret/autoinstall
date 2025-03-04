@@ -8,6 +8,12 @@ fi
 
 # Update dan instalasi paket yang diperlukan
 echo "Menginstal paket yang diperlukan..."
+echo "phpmyadmin phpmyadmin/dbconfig-install boolean true" | debconf-set-selections
+echo "phpmyadmin phpmyadmin/app-password-confirm password yourpassword" | debconf-set-selections
+echo "phpmyadmin phpmyadmin/mysql/admin-pass password yourpassword" | debconf-set-selections
+echo "phpmyadmin phpmyadmin/mysql/app-pass password yourpassword" | debconf-set-selections
+echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2" | debconf-set-selections
+
 apt update && apt install openssh-server apache2 php mariadb-server phpmyadmin wget unzip -y
 
 # Konfigurasi phpMyAdmin
@@ -40,5 +46,25 @@ EOF
 echo "Restart layanan Apache..."
 systemctl restart apache2
 
-echo "Proses instalasi WordPress selesai!"
-echo "Anda dapat melanjutkan konfigurasi melalui browser."
+# Mendapatkan alamat IP server
+server_ip=$(hostname -I | awk '{print $1}')
+
+# Informasi akhir
+echo -e "\e[32mInstalasi selesai!\e[0m"
+echo -e "Akses PhpMyAdmin Di Browser: \e[32mhttp://$server_ip/phpmyadmin\e[0m"
+echo -e "Akses WordPress Di Browser: \e[32mhttp://$server_ip/wordpress\e[0m"
+
+echo -e "\e[32m"
+
+echo -e "\e[35m===============================\e[0m"
+echo -e "\e[35m    Script by Sufsembret    \e[0m"
+echo -e "\e[35m===============================\e[0m"
+
+# Membuka alamat IP server secara otomatis jika dalam lingkungan grafis
+if command -v xdg-open &> /dev/null; then
+  xdg-open "http://$server_ip/wordpress"
+elif command -v gnome-open &> /dev/null; then
+  gnome-open "http://$server_ip/wordpress"
+elif command -v sensible-browser &> /dev/null; then
+  sensible-browser "http://$server_ip/wordpress"
+fi
