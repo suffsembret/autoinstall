@@ -51,9 +51,9 @@ server_ip=$(hostname -I | awk '{print $1}')
 
 # Informasi akhir
 echo -e "\e[32mInstalasi selesai!\e[0m"
-echo -e "Akses phpMyAdmin di: \e[34mhttp://$server_ip/phpmyadmin\e[0m"
-echo -e "Akses WordPress di: \e[34mhttp://$server_ip/wordpress\e[0m"
-echo -e "\e[33mGantilah <your_server_ip> dengan alamat IP server Anda.\e[0m"
+echo -e "Akses phpMyAdmin di: \e[32mhttp://$server_ip/phpmyadmin\e[0m"
+echo -e "Akses WordPress di: \e[32mhttp://$server_ip/wordpress\e[0m"
+
 echo -e "\e[32m"
 
 echo -e "\e[35m===============================\e[0m"
