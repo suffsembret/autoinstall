@@ -66,4 +66,5 @@ if command -v xdg-open &> /dev/null; then
 elif command -v gnome-open &> /dev/null; then
   gnome-open "http://$server_ip/wordpress"
 elif command -v sensible-browser &> /dev/null; then
-  sensible-browser "http://$server_ip/wordpress"i
+  sensible-browser "http://$server_ip/wordpress"
+fi
