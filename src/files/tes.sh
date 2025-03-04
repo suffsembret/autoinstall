@@ -46,5 +46,13 @@ EOF
 echo "Restart layanan Apache..."
 systemctl restart apache2
 
-echo "Proses instalasi WordPress selesai!"
-echo "Anda dapat melanjutkan konfigurasi melalui browser."
+# Informasi akhir
+echo -e "\e[32mInstalasi selesai!\e[0m"
+echo -e "Akses phpMyAdmin di: \e[34mhttp://<your_server_ip>/phpmyadmin\e[0m"
+echo -e "Akses WordPress di: \e[34mhttp://<your_server_ip>/wordpress\e[0m"
+echo -e "\e[33mGantilah <your_server_ip> dengan alamat IP server Anda.\e[0m"
+echo -e "\e[32m"
+
+echo -e "\e[35m===============================\e[0m"
+echo -e "\e[35m    Script by Sufsembret    \e[0m"
+echo -e "\e[35m===============================\e[0m"
