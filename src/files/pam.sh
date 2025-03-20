@@ -6,33 +6,54 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-echo "Memperbarui dan meng-upgrade sistem..."
+echo "🔄 Memperbarui dan meng-upgrade sistem..."
 apt update && apt upgrade -y
 
-echo "Menginstal paket yang diperlukan..."
-apt install -y wget git ffmpeg nodejs npm curl
+echo "📦 Menginstal paket yang diperlukan..."
+apt install -y wget git ffmpeg nodejs npm curl nano
 
 # Instal Yarn jika belum ada
 if ! command -v yarn &> /dev/null; then
-    echo "Menginstal Yarn..."
+    echo "📦 Menginstal Yarn..."
     npm install -g yarn
 fi
 
-# Membuat folder proyek
+# Menyiapkan folder proyek
 PROJECT_DIR="/root/nama-folder"
 mkdir -p "$PROJECT_DIR"
 cd "$PROJECT_DIR"
 
-# Inisialisasi proyek Node.js jika belum ada
+# Membuat package.json jika belum ada
 if [ ! -f "package.json" ]; then
-    echo "Membuat file package.json..."
-    npm init -y
+    echo "📄 Membuat file package.json..."
+    cat > package.json <<EOL
+{
+  "name": "nama-proyek",
+  "version": "1.0.0",
+  "description": "Proyek Node.js di Debian 11",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+EOL
+fi
+
+# Membuat index.js jika belum ada
+if [ ! -f "index.js" ]; then
+    echo "📄 Membuat file index.js..."
+    cat > index.js <<EOL
+console.log("✅ Server berjalan dengan sukses!");
+EOL
 fi
 
 # Install dependencies dengan Yarn
-echo "Menginstal dependencies..."
+echo "📦 Menginstal dependencies..."
 yarn install
 
 # Menjalankan aplikasi
-echo "Menjalankan aplikasi..."
+echo "🚀 Menjalankan aplikasi..."
 npm start
