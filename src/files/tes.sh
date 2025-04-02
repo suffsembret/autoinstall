@@ -16,24 +16,40 @@ echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2" | debconf
 
 apt update && apt install openssh-server apache2 php mariadb-server phpmyadmin wget unzip -y
 
+# Meminta pengguna memasukkan password satu kali untuk phpMyAdmin dan WordPress
+read -sp "Masukkan password untuk phpMyAdmin dan WordPress: " user_password
+echo ""
+
 # Konfigurasi phpMyAdmin
-read -p "Masukkan password untuk phpMyAdmin: " phpmyadmin_password
-mysql -u root -e "ALTER USER 'phpmyadmin'@'localhost' IDENTIFIED BY '$phpmyadmin_password';"
+mysql -u root -e "ALTER USER 'phpmyadmin'@'localhost' IDENTIFIED BY '$user_password';"
 
 # Meminta pengguna memasukkan nama database
 read -p "Masukkan nama database yang ingin dibuat: " dbname
 read -p "Masukkan username untuk database: " dbuser
-read -sp "Masukkan password untuk user database: " dbpass
 
 echo "\nMembuat database dan user..."
 mysql -u root -p <<EOF
 CREATE DATABASE $dbname;
-CREATE USER '$dbuser'@'localhost' IDENTIFIED BY '$dbpass';
+CREATE USER '$dbuser'@'localhost' IDENTIFIED BY '$user_password';
 GRANT ALL PRIVILEGES ON $dbname.* TO '$dbuser'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
 echo "Database '$dbname' dan user '$dbuser' berhasil dibuat."
+
+# Unduh dan ekstrak WordPress
+echo "Mengunduh dan mengekstrak WordPress..."
+cd /var/www/html
+wget http://172.16.90.2/unduh/wordpress.zip
+unzip wordpress.zip
+chmod -R 777 wordpress
+
+# Konfigurasi database untuk WordPress
+echo "Membuat konfigurasi WordPress..."
+cp wordpress/wp-config-sample.php wordpress/wp-config.php
+sed -i "s/database_name_here/$dbname/" wordpress/wp-config.php
+sed -i "s/username_here/$dbuser/" wordpress/wp-config.php
+sed -i "s/password_here/$user_password/" wordpress/wp-config.php
 
 # Restart layanan Apache untuk memastikan semua berjalan
 echo "Restart layanan Apache..."
@@ -45,3 +61,4 @@ server_ip=$(hostname -I | awk '{print $1}')
 # Informasi akhir
 echo -e "\e[32mInstalasi selesai!\e[0m"
 echo -e "Akses phpMyAdmin di: \e[32mhttp://$server_ip/phpmyadmin\e[0m"
+echo -e "Akses WordPress di: \e[32mhttp://$server_ip/wordpress\e[0m"
