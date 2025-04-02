@@ -20,27 +20,20 @@ apt update && apt install openssh-server apache2 php mariadb-server phpmyadmin w
 read -p "Masukkan password untuk phpMyAdmin: " phpmyadmin_password
 mysql -u root -e "ALTER USER 'phpmyadmin'@'localhost' IDENTIFIED BY '$phpmyadmin_password';"
 
-# Konfigurasi SSH untuk mengizinkan login root
-echo "Mengonfigurasi SSH untuk login root..."
-sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-systemctl restart ssh
+# Meminta pengguna memasukkan nama database
+read -p "Masukkan nama database yang ingin dibuat: " dbname
+read -p "Masukkan username untuk database: " dbuser
+read -sp "Masukkan password untuk user database: " dbpass
 
-# Unduh dan ekstrak WordPress
-echo "Mengunduh dan mengekstrak WordPress..."
-cd /var/www/html
-wget http://172.16.90.2/unduh/wordpress.zip
-unzip wordpress.zip
-chmod -R 777 wordpress
-
-# Konfigurasi database untuk WordPress
-echo "Membuat database untuk WordPress..."
+echo "\nMembuat database dan user..."
 mysql -u root -p <<EOF
-CREATE DATABASE dbwordpress;
-CREATE USER 'adminwordpress'@'localhost' IDENTIFIED BY 'passwordwordpress';
-GRANT ALL PRIVILEGES ON dbwordpress.* TO 'adminwordpress'@'localhost';
+CREATE DATABASE $dbname;
+CREATE USER '$dbuser'@'localhost' IDENTIFIED BY '$dbpass';
+GRANT ALL PRIVILEGES ON $dbname.* TO '$dbuser'@'localhost';
 FLUSH PRIVILEGES;
 EOF
+
+echo "Database '$dbname' dan user '$dbuser' berhasil dibuat."
 
 # Restart layanan Apache untuk memastikan semua berjalan
 echo "Restart layanan Apache..."
@@ -52,19 +45,3 @@ server_ip=$(hostname -I | awk '{print $1}')
 # Informasi akhir
 echo -e "\e[32mInstalasi selesai!\e[0m"
 echo -e "Akses phpMyAdmin di: \e[32mhttp://$server_ip/phpmyadmin\e[0m"
-echo -e "Akses WordPress di: \e[32mhttp://$server_ip/wordpress\e[0m"
-
-echo -e "\e[32m"
-
-echo -e "\e[35m===============================\e[0m"
-echo -e "\e[35m    Script by Sufsembret    \e[0m"
-echo -e "\e[35m===============================\e[0m"
-
-# Membuka alamat IP server secara otomatis jika dalam lingkungan grafis
-if command -v xdg-open &> /dev/null; then
-  xdg-open "http://$server_ip/wordpress"
-elif command -v gnome-open &> /dev/null; then
-  gnome-open "http://$server_ip/wordpress"
-elif command -v sensible-browser &> /dev/null; then
-  sensible-browser "http://$server_ip/wordpress"
-fi
